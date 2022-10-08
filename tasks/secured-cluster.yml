@@ -1,0 +1,47 @@
+---curl -O https://mirror.openshift.com/pub/rhacs/assets/3.72.0/bin/Linux/roxctl
+
+chmod +x roxctl
+
+cp roxctl /usr/bin/
+
+
+
+
+
+roxctl -e "$ROX_CENTRAL_ADDRESS" central init-bundles generate init-bundle --output-secrets cluster_init_bundle.yaml
+
+oc create -f cluster_init_bundle.yaml -n stackrox
+
+apiVersion: platform.stackrox.io/v1alpha1
+kind: SecuredCluster
+metadata:
+  name: stackrox-secured-cluster-services
+  namespace: stackrox
+spec:
+  admissionControl:
+    bypass: BreakGlassAnnotation
+    contactImageScanners: DoNotScanInline
+    listenOnCreates: true
+    listenOnEvents: true
+    listenOnUpdates: true
+    timeoutSeconds: 20
+  auditLogs:
+    collection: Auto
+  centralEndpoint: central-stackrox.apps.cluster-9mvdw.9mvdw.sandbox1146.opentlc.com:443
+  clusterName: my-cluster
+  perNode:
+    collector:
+      collection: EBPF
+      imageFlavor: Regular
+    taintToleration: TolerateTaints
+  scanner:
+    analyzer:
+      scaling:
+        autoScaling: Enabled
+        maxReplicas: 5
+        minReplicas: 2
+        replicas: 3
+    scannerComponent: AutoSense
+
+
+
