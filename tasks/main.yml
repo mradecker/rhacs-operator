@@ -1,0 +1,7 @@
+---
+
+- include: rhacs-operator.yml
+
+- include: central.yml
+
+- include: secured-cluster.yml
