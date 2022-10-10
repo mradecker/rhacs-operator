@@ -1,7 +1,10 @@
 ---
 
-- import_playbook: rhacs-operator.yml
+- import_tasks: rhacs-operator.yml
+  when: rhacs_operator | bool
 
-- import_playbook: central.yml
+- import_tasks: central.yml
+  when: central | bool
 
-- import_playbook: secured-cluster.yml
+- import_tasks: secured-cluster.yml
+  when: secured_cluster | bool
