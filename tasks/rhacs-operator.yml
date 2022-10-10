@@ -39,4 +39,5 @@
         name: rhacs-operator
         source: redhat-operators
         sourceNamespace: openshift-marketplace
+#       startingCSV: {{ rhacs_version }}
 
