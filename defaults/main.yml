@@ -1,3 +1,7 @@
+# Run on initial installment of central and switch boolean to no if just adding more secured clusters
 central: yes
 
 secured_cluster: yes
+
+# Option to specify which version of RHACS to install.  Commented out in rhacs-operator.yml
+rhacs_version:
