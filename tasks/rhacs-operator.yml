@@ -33,6 +33,7 @@
       kind: Subscription
       metadata:
         name: rhacs-operator
+        namespace: rhacs-operator
       spec:
         channel: latest
         installPlanApproval: Automatic
