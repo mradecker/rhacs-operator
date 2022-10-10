@@ -35,10 +35,7 @@
   shell: source ~/.bashrc
   
 - name: Generate init-bundle secrets file
-  shell: "roxctl -e {{ central_url.stdout }}:443 central init-bundles generate init-bundle --output-secrets cluster_init_bundle.yaml"
-  args:
-    chdir: ~/
-    creates: cluster_init_bundle.yaml
+  shell: "roxctl -e {{ central_url.stdout }}:443 central init-bundles generate init-bundle --output-secrets ~/cluster_init_bundle.yaml"
 
 - name: Create init bundle secrets
   kubernetes.core.k8s:
