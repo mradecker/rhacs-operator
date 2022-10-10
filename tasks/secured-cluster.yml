@@ -1,18 +1,12 @@
 ---
 
-- name: Wait for central deployment
-  kubernetes.core.k8s:
-    definition:
-      apiVersion: apps/v1
-      kind: Deployment
-      metadata:
-        name: central
-        namespace: stackrox
+- name: Wait for central pods
+  kubernetes.core.k8s_info:
+    kind: Pod
+    name: central
+    namespace: stackrox
     wait: yes
-    wait_condition:
-      type: Available
-      status: "True"
-      reason: MinimumReplicasAvailable
+    wait_sleep: 10
   
 - name: Download roxctl tool
   get_url:
@@ -21,24 +15,27 @@
     mode: 0755
     
 - name: Get Central route
-  kubernetes.core.k8s_info:
-    api_version: route.openshift.io/v1
-    kind: Route
-    name: central
-    namespace: stackrox
+  shell: "oc get route central -n stackrox -o jsonpath='{ .spec.host }'"
   register: central_url
 
-- name: Generate ROX_API_Token
-  shell: curl -sk -u "admin:$(oc get secret central-htpasswd -n stackrox -o jsonpath='{ .data.password }' | base64 -d)" "$(oc get route/central -n stackrox -o jsonpath='{ .spec.host }')/v1/apitokens/generate" -d '{"name":"token name", "role":"Admin"}' | jq -r ".token" > rox_api_token
-  args:
-    chdir: ~/
-    creates: rox_api_token
+- name: Get Central admin password
+  shell: "oc get secret central-htpasswd -n stackrox -o jsonpath='{ .data.password }' | base64 -d"
+  register: central_password
 
-- name: Register ROX_API_TOKEN to roxctl
-  shell: roxctl central debug dump --token-file ~/rox_api_token
+- name: Generate ROX_API_Token
+  shell: curl -sk -u "admin:{{ central_password.stdout }}" "https://{{ central_url.stdout }}/v1/apitokens/generate" -d '{"name":"token name", "role":"Admin"}' | jq -r ".token"
+  register: rox_api_token
+
+- name: Add ROX_API_TOKEN for roxctl authentication to bashrc
+  lineinfile:
+    path: ~/.bashrc
+    line: 'export ROX_API_TOKEN={{ rox_api_token.stdout }}'
+
+- name: Source bashrc
+  shell: source ~/.bashrc
   
 - name: Generate init-bundle secrets file
-  shell: 'roxctl -e {{ central_url }} central init-bundles generate init-bundle --output-secrets cluster_init_bundle.yaml'
+  shell: "roxctl -e {{ central_url.stdout }}:443 central init-bundles generate init-bundle --output-secrets cluster_init_bundle.yaml"
   args:
     chdir: ~/
     creates: cluster_init_bundle.yaml
@@ -68,7 +65,7 @@
           timeoutSeconds: 20
         auditLogs:
           collection: Auto
-        centralEndpoint: {{ central_url }}:443
+        centralEndpoint: '{{ central_url.stdout }}:443'
         clusterName: my-cluster
         perNode:
           collector:
