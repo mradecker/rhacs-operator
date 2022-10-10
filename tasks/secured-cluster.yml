@@ -27,6 +27,15 @@
     name: central
     namespace: stackrox
   register: central_url
+
+- name: Generate ROX_API_Token
+  shell: curl -sk -u "admin:$(oc get secret central-htpasswd -n stackrox -o jsonpath='{ .data.password }' | base64 -d)" "$(oc get route/central -n stackrox -o jsonpath='{ .spec.host }')/v1/apitokens/generate" -d '{"name":"token name", "role":"Admin"}' | jq -r ".token" > rox_api_token
+  args:
+    chdir: ~/
+    creates: rox_api_token
+
+- name: Register ROX_API_TOKEN to roxctl
+  shell: roxctl central debug dump --token-file ~/rox_api_token
   
 - name: Generate init-bundle secrets file
   shell: 'roxctl -e {{ central_url }} central init-bundles generate init-bundle --output-secrets cluster_init_bundle.yaml'
