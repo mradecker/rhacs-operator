@@ -66,7 +66,7 @@
         auditLogs:
           collection: Auto
         centralEndpoint: '{{ central_url.stdout }}:443'
-        clusterName: my-cluster
+        clusterName: '{{ cluster_name }}'
         perNode:
           collector:
             collection: EBPF
