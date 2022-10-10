@@ -1,0 +1,61 @@
+---
+
+- name: Delete Secured Cluster object
+  kubernetes.core.k8s:
+    state: absent
+    definition:
+      apiVersion: platform.stackrox.io/v1alpha1
+      kind: SecuredCluster
+      metadata:
+        name: stackrox-secured-cluster-services
+        namespace: stackrox
+      spec:
+        admissionControl:
+          bypass: BreakGlassAnnotation
+          contactImageScanners: DoNotScanInline
+          listenOnCreates: true
+          listenOnEvents: true
+          listenOnUpdates: true
+          timeoutSeconds: 20
+        auditLogs:
+          collection: Auto
+        centralEndpoint: '{{ central_url.stdout }}:443'
+        clusterName: '{{ cluster_name }}'
+        perNode:
+          collector:
+            collection: EBPF
+            imageFlavor: Regular
+          taintToleration: TolerateTaints
+        scanner:
+          analyzer:
+            scaling:
+              autoScaling: Enabled
+              maxReplicas: 5
+              minReplicas: 2
+              replicas: 3
+          scannerComponent: AutoSense
+          
+- name: Remove sensor-tls secret
+  kubernetes.core.k8s:
+    state: absent
+    api_version: v1
+    kind: Secret
+    namespace: stackrox
+    name: sensor-tls
+
+- name: Remove admission-control-tls secret
+  kubernetes.core.k8s:
+    state: absent
+    api_version: v1
+    kind: Secret
+    namespace: stackrox
+    name: admission-control-tls
+
+- name: Remove collector-tls secret
+  kubernetes.core.k8s:
+    state: absent
+    api_version: v1
+    kind: Secret
+    namespace: stackrox
+    name: collector-tls
+  
