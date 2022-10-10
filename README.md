@@ -1,4 +1,4 @@
-# rhacs-operator
+# Red Hat Advanced Cluster Security (RHACS) Operator
 
 This role installs the Red Hat Advanced Cluster Security (RHACS) operator, creates Central, generates and creates the init-bundle.yaml, and creates the Secured Cluster.  
 
