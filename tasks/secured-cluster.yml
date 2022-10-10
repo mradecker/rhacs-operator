@@ -78,6 +78,11 @@
               replicas: 3
           scannerComponent: AutoSense
 
-
+# The secrets generated from this file can't be used for other Secured Clusters
+# If another Secured Cluster need to be created, regenerate this file
+- name: Remove cluster-init-bundle.yaml
+  file:
+    path: ~/cluster-init-bundle.yaml
+    state: absent
 
 
