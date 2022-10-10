@@ -1,7 +1,7 @@
 ---
 
-- include: rhacs-operator.yml
+- import_playbook: rhacs-operator.yml
 
-- include: central.yml
+- import_playbook: central.yml
 
-- include: secured-cluster.yml
+- import_playbook: secured-cluster.yml
