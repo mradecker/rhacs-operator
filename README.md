@@ -4,7 +4,7 @@ This role installs the Red Hat Advanced Cluster Security (RHACS) operator, creat
 
 Clone this repo and run the rhacs-role.yaml play to execute the role.
 
-## ex. ansible-playbook rhacs-operator/rhacs-role.yaml -vv
+ex. ansible-playbook rhacs-operator/rhacs-role.yaml -vv
 
 This role includes the following playbooks in the tasks directory.  Make sure to specify which playbooks to run in the defaults/main.yml:
 
