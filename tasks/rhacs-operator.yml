@@ -1,33 +1,42 @@
-oc create namespace rhacs-operator
+---
 
-oc create namespace stackrox
+- name: Create rhacs-operator namespace
+  kubernetes.core.k8s:
+    state: present
+    api_version: v1
+    kind: Namespace
+    name: rhacs-operator
 
+- name: Create stackrox namespace
+  kubernetes.core.k8s:
+    state: present
+    api_version: v1
+    kind: Namespace
+    name: stackrox
 
+- name: Create Operator Group for rhacs-operator
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: operators.coreos.com/v1
+      kind: OperatorGroup
+      metadata:
+        name: rhacs-operator
+        namespace: rhacs-operator
+      spec: {}
 
+- name: Create subscription for rhacs-operator
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: operators.coreos.com/v1alpha1
+      kind: Subscription
+      metadata:
+        name: rhacs-operator
+      spec:
+        channel: latest
+        installPlanApproval: Automatic
+        name: rhacs-operator
+        source: redhat-operators
+        sourceNamespace: openshift-marketplace
 
-
-
-apiVersion: operators.coreos.com/v1
-kind: OperatorGroup
-metadata:
-  annotations:
-    olm.providedAPIs: Central.v1alpha1.platform.stackrox.io,SecuredCluster.v1alpha1.platform.stackrox.io
-  name: rhacs-operator
-  namespace: rhacs-operator
-spec: {}
-
-
-apiVersion: operators.coreos.com/v1alpha1
-kind: Subscription
-metadata:
-  labels:
-    operators.coreos.com/rhacs-operator.rhacs-operator: ""
-  name: rhacs-operator
-  namespace: rhacs-operator
-spec:
-  channel: latest
-  installPlanApproval: Automatic
-  name: rhacs-operator
-  source: redhat-operators
-  sourceNamespace: openshift-marketplace
-  startingCSV: rhacs-operator.v3.72.0
