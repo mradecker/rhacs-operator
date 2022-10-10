@@ -8,3 +8,7 @@ secured_cluster: yes
 
 # Option to specify which version of RHACS to install.  Commented out in rhacs-operator.yml
 rhacs_version:
+
+delete_secured_cluster: no
+
+cluster_name: my-cluster
