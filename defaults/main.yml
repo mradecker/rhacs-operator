@@ -1,3 +1,6 @@
+# Set boolean to yes for initial installation of operator and false when only installing central/secured clusters
+rhacs_operator: yes
+
 # Run on initial installment of central and switch boolean to no if just adding more secured clusters
 central: yes
 
