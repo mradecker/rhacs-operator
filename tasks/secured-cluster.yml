@@ -1,47 +1,80 @@
----curl -O https://mirror.openshift.com/pub/rhacs/assets/3.72.0/bin/Linux/roxctl
+---
 
-chmod +x roxctl
+- name: Wait for central deployment
+  kubernetes.core.k8s:
+    definition:
+      apiVersion: apps/v1
+      kind: Deployment
+      metadata:
+        name: central
+        namespace: stackrox
+    wait: yes
+    wait_condition:
+      type: Available
+      status: "True"
+      reason: MinimumReplicasAvailable
+  
+- name: Download roxctl tool
+  get_url:
+    url: https://mirror.openshift.com/pub/rhacs/assets/3.72.0/bin/Linux/roxctl
+    dest: /usr/bin/
+    mode: 0755
+    
+- name: Get Central route
+  kubernetes.core.k8s_info:
+    api_version: route.openshift.io/v1
+    kind: Route
+    name: central
+    namespace: stackrox
+  register: central_url
+  
+- name: Generate init-bundle secrets file
+  shell: 'roxctl -e {{ central_url }} central init-bundles generate init-bundle --output-secrets cluster_init_bundle.yaml'
+  args:
+    chdir: ~/
+    creates: cluster_init_bundle.yaml
 
-cp roxctl /usr/bin/
+- name: Create init bundle secrets
+  kubernetes.core.k8s:
+    state: present
+    namespace: stackrox
+    src: ~/cluster_init_bundle.yaml
 
+- name: Create secured cluster
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: platform.stackrox.io/v1alpha1
+      kind: SecuredCluster
+      metadata:
+        name: stackrox-secured-cluster-services
+        namespace: stackrox
+      spec:
+        admissionControl:
+          bypass: BreakGlassAnnotation
+          contactImageScanners: DoNotScanInline
+          listenOnCreates: true
+          listenOnEvents: true
+          listenOnUpdates: true
+          timeoutSeconds: 20
+        auditLogs:
+          collection: Auto
+        centralEndpoint: {{ central_url }}:443
+        clusterName: my-cluster
+        perNode:
+          collector:
+            collection: EBPF
+            imageFlavor: Regular
+          taintToleration: TolerateTaints
+        scanner:
+          analyzer:
+            scaling:
+              autoScaling: Enabled
+              maxReplicas: 5
+              minReplicas: 2
+              replicas: 3
+          scannerComponent: AutoSense
 
-
-
-
-roxctl -e "$ROX_CENTRAL_ADDRESS" central init-bundles generate init-bundle --output-secrets cluster_init_bundle.yaml
-
-oc create -f cluster_init_bundle.yaml -n stackrox
-
-apiVersion: platform.stackrox.io/v1alpha1
-kind: SecuredCluster
-metadata:
-  name: stackrox-secured-cluster-services
-  namespace: stackrox
-spec:
-  admissionControl:
-    bypass: BreakGlassAnnotation
-    contactImageScanners: DoNotScanInline
-    listenOnCreates: true
-    listenOnEvents: true
-    listenOnUpdates: true
-    timeoutSeconds: 20
-  auditLogs:
-    collection: Auto
-  centralEndpoint: central-stackrox.apps.cluster-9mvdw.9mvdw.sandbox1146.opentlc.com:443
-  clusterName: my-cluster
-  perNode:
-    collector:
-      collection: EBPF
-      imageFlavor: Regular
-    taintToleration: TolerateTaints
-  scanner:
-    analyzer:
-      scaling:
-        autoScaling: Enabled
-        maxReplicas: 5
-        minReplicas: 2
-        replicas: 3
-    scannerComponent: AutoSense
 
 
 
