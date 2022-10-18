@@ -82,7 +82,7 @@
 # If another Secured Cluster need to be created, regenerate this file
 - name: Remove cluster-init-bundle.yaml
   file:
-    path: ~/cluster-init-bundle.yaml
+    path: ~/cluster_init_bundle.yaml
     state: absent
 
 
