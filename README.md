@@ -11,3 +11,5 @@ This role includes the following playbooks in the tasks directory.  Make sure to
 1. rhacs-operator.yml to install the RHACS operator and create the rhacs-operator and stackrox namespaces.
 2. central.yml to create Central which includes 3 deployments (central, scanner, and scanner-db).
 3. secured_cluster.yml which starts by ensuring the Central deployments are up and then installs the roxctl tool, authenticates it to central with the ROX_API_TOKEN, generates the init-bundle, creates the resulting sensor-tls, collector-tls, and admission-control-tls secrets which are needed for a cluster to join Central as a Secured Cluster.  Finally, the Secured Cluster object is created which starts the deployments for sensor, collector, and admission controller.
+
+If you need to update Python3 to a newer version, follow the steps in https://phoenixnap.com/kb/upgrade-python
