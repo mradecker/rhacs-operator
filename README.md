@@ -13,3 +13,9 @@ This role includes the following playbooks in the tasks directory.  Make sure to
 3. secured_cluster.yml which starts by ensuring the Central deployments are up and then installs the roxctl tool, authenticates it to central with the ROX_API_TOKEN, generates the init-bundle, creates the resulting sensor-tls, collector-tls, and admission-control-tls secrets which are needed for a cluster to join Central as a Secured Cluster.  Finally, the Secured Cluster object is created which starts the deployments for sensor, collector, and admission controller.
 
 If you need to update Python3 to a newer version, follow the steps in https://phoenixnap.com/kb/upgrade-python
+
+If the playbook ends in an error No module named "Kubernetes", install the module with:
+
+python3 -m pip install kubernetes
+
+If it's missing a different module such as openshift, install the openshift module the same way.
