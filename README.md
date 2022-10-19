@@ -2,7 +2,7 @@
 
 This role installs the Red Hat Advanced Cluster Security (RHACS) operator, creates Central, generates and creates the init-bundle.yaml, and creates the Secured Cluster.  
 
-Clone this repo and run the rhacs-role.yaml play to execute the role.
+Clone this repo and run the rhacs-role.yaml play to execute the role.  Ensure you have installed Ansible with the control node requirements outlined in https://docs.ansible.com/ansible-core/2.13/installation_guide/intro_installation.html#control-node-requirements
 
 ex. ansible-playbook rhacs-operator/rhacs-role.yaml -vv
 
