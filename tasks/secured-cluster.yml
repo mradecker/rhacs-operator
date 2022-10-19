@@ -9,6 +9,7 @@
     wait_sleep: 10
   
 - name: Download roxctl tool
+  become: yes
   get_url:
     url: https://mirror.openshift.com/pub/rhacs/assets/3.72.0/bin/Linux/roxctl
     dest: /usr/bin/
@@ -32,7 +33,7 @@
     line: 'export ROX_API_TOKEN={{ rox_api_token.stdout }}'
 
 - name: Source bashrc
-  shell: source ~/.bashrc
+  shell: 'source ~/.bashrc'
   
 - name: Generate init-bundle secrets file
   shell: "roxctl -e {{ central_url.stdout }}:443 central init-bundles generate init-bundle --output-secrets ~/cluster_init_bundle.yaml"
