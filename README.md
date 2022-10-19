@@ -22,3 +22,7 @@ This role includes the following playbooks in the tasks directory.  Make sure to
    python3 -m pip install kubernetes
 
    If it's missing a different module such as openshift, install the openshift module the same way.
+
+3) Update /etc/ansible/ansible.cfg with:
+
+   ansible_python_interpreter=/usr/bin/python3
