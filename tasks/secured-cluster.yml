@@ -34,6 +34,8 @@
 
 - name: Source bashrc
   shell: 'source ~/.bashrc'
+  args:
+    chdir: ~/
   
 - name: Generate init-bundle secrets file
   shell: "roxctl -e {{ central_url.stdout }}:443 central init-bundles generate init-bundle --output-secrets ~/cluster_init_bundle.yaml"
