@@ -1,5 +1,12 @@
 ---
 
+- name: Wait for rhacs operator pod
+  kubernetes.core.k8s_info:
+    kind: Pod
+    namespace: rhacs-operator
+    wait: yes
+    wait_sleep: 10
+
 - name: Create RHACS Central
   kubernetes.core.k8s:
     state: present
