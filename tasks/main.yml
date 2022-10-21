@@ -12,5 +12,5 @@
 - import_tasks: roxctl.yml
   when: roxctl | bool
   
-- import_tasks: delete_secured_cluster.yml
-  when: delete_secured_cluster | bool
+- import_tasks: uninstall.yml
+  when: uninstall | bool
