@@ -3,7 +3,6 @@
 - name: Wait for central pods
   kubernetes.core.k8s_info:
     kind: Pod
-    name: central
     namespace: stackrox
     wait: yes
     wait_sleep: 10
@@ -39,8 +38,14 @@
     chdir: ~/
   
 - name: Generate init-bundle secrets file
-  shell: "roxctl -e {{ central_url.stdout }}:443 central init-bundles generate init-bundle --output-secrets ~/cluster_init_bundle.yaml"
-
+  shell: curl -sk -X POST -u admin:{{ central_password.stdout }} https://{{ central_url.stdout }}/v1/cluster-init/init-bundles -d '{"name":"init_bundle"}' | jq -r ".kubectlBundle" | base64 -d
+  register: init_bundle
+  
+- name: Echo init_bundle contents into cluster_init_bundle.yaml
+  copy:
+    content: "{{ init_bundle.stdout }}"
+    dest: ~/cluster_init_bundle.yaml
+  
 - name: Create init bundle secrets
   kubernetes.core.k8s:
     state: present
