@@ -1,0 +1,31 @@
+---
+- name: Download roxctl tool
+  become: yes
+  get_url:
+    url: https://mirror.openshift.com/pub/rhacs/assets/3.72.0/bin/Linux/roxctl
+    dest: /usr/bin/
+    mode: 0755
+
+- name: Get Central route
+  shell: "oc get route central -n stackrox -o jsonpath='{ .spec.host }'"
+  register: central_url
+
+- name: Get Central admin password
+  shell: "oc get secret central-htpasswd -n stackrox -o jsonpath='{ .data.password }' | base64 -d"
+  register: central_password
+
+- name: Generate ROX_API_TOKEN
+  shell: curl -sk -u "admin:{{ central_password.stdout }}" "https://{{ central_url.stdout }}/v1/apitokens/generate" -d '{"name":"token name", "role":"Admin"}' | jq -r ".token"
+  register: rox_api_token
+
+- name: Add ROX_API_TOKEN for roxctl authentication to bashrc
+  lineinfile:
+    path: ~/.bashrc
+    regexp: '^export ROX_API_TOKEN='
+    line: 'export ROX_API_TOKEN={{ rox_api_token.stdout }}'
+    
+- name: Source bashrc
+  shell: 'source ~/.bashrc'
+  args:
+    chdir: ~/
+
