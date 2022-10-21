@@ -6,6 +6,10 @@ central: yes
 
 secured_cluster: yes
 
+# If you want to download and authenticate roxctl to central, run this playbook
+
+roxctl: yes
+
 # Option to specify which version of RHACS to install.  Commented out in rhacs-operator.yml
 rhacs_version:
 
