@@ -29,4 +29,4 @@ This role includes the following playbooks in the tasks directory.  Make sure to
    
 4) If you are using an older version of Ansible (2.9 or earlier), kubernetes.core.k8s may not be found and you may need to switch to k8s instead.  If you don't want to upgraade Ansible, you can try using the k8s module and re-running the playbook.
 
-   sed -i s/kubernetes.core.k8s/k8s/g rhacs-operator/
+   
