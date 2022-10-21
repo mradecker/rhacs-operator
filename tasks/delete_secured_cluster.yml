@@ -35,27 +35,69 @@
               replicas: 3
           scannerComponent: AutoSense
           
-- name: Remove sensor-tls secret
-  kubernetes.core.k8s:
-    state: absent
-    api_version: v1
-    kind: Secret
-    namespace: stackrox
-    name: sensor-tls
 
-- name: Remove admission-control-tls secret
+- name: Remove RHACS Central
   kubernetes.core.k8s:
     state: absent
-    api_version: v1
-    kind: Secret
-    namespace: stackrox
-    name: admission-control-tls
+    definition:
+      apiVersion: platform.stackrox.io/v1alpha1
+      kind: Central
+      metadata:
+        name: stackrox-central-services
+        namespace: stackrox
+      spec:
+        central:
+          exposure:
+            loadBalancer:
+              enabled: false
+              port: 443
+            nodePort:
+              enabled: false
+            route:
+              enabled: true
+          persistence:
+            persistentVolumeClaim:
+              claimName: stackrox-db
+        egress:
+          connectivityPolicy: Online
+        scanner:
+          analyzer:
+            scaling:
+              autoScaling: Enabled
+              maxReplicas: 5
+              minReplicas: 2
+              replicas: 3
+          scannerComponent: Enabled
+          
 
-- name: Remove collector-tls secret
+- name: Remove subscription for rhacs-operator
+  kubernetes.core.k8s:
+    state: absent
+    definition:
+      apiVersion: operators.coreos.com/v1alpha1
+      kind: Subscription
+      metadata:
+        name: rhacs-operator
+        namespace: rhacs-operator
+      spec:
+        channel: latest
+        installPlanApproval: Automatic
+        name: rhacs-operator
+        source: redhat-operators
+        sourceNamespace: openshift-marketplace
+        
+- name: Remove stackrox namespace
   kubernetes.core.k8s:
     state: absent
     api_version: v1
-    kind: Secret
-    namespace: stackrox
-    name: collector-tls
-  
+    kind: Namespace
+    name: stackrox
+    
+- name: Remove rhacs-operator namespace
+  kubernetes.core.k8s:
+    state: absent
+    api_version: v1
+    kind: Namespace
+    name: rhacs-operator
+
+
