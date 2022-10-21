@@ -1,5 +1,9 @@
 ---
 
+- name: Get Central route
+  shell: "oc get route central -n stackrox -o jsonpath='{ .spec.host }'"
+  register: central_url
+
 - name: Delete Secured Cluster object
   kubernetes.core.k8s:
     state: absent
